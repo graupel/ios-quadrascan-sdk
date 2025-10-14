@@ -1,0 +1,1 @@
+# ios-quadrascan-sdk
