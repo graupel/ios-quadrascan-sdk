@@ -1,0 +1,196 @@
+name: Deploy SDK Release
+
+on:
+  repository_dispatch:
+    types: [deploy_release]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Payload
+        id: payload
+        run: |
+          {
+            echo "VERSION=${{ github.event.client_payload.version }}"
+            echo "CHECKSUM=${{ github.event.client_payload.checksum }}"
+            echo "FRAMEWORK_NAME=${{ github.event.client_payload.framework_name }}"
+            echo "TAG=${{ github.event.client_payload.tag }}"
+            echo "INTERNAL_RELEASE_URL=${{ github.event.client_payload.internal_release_url }}"
+          } >> "$GITHUB_ENV"
+          
+          echo "Received deployment request:"
+          echo "  Version: ${{ github.event.client_payload.version }}"
+          echo "  Tag: ${{ github.event.client_payload.tag }}"
+          echo "  Checksum: ${{ github.event.client_payload.checksum }}"
+          echo "  Framework: ${{ github.event.client_payload.framework_name }}"
+
+      - name: Set Workflow Variables
+        run: |
+          VERSION_SHORT="${TAG%.*}"
+          RELEASE_BRANCH="release/$VERSION_SHORT"
+          INTERNAL_REPO="graupel/ios-quadrascan-sdk-internal"
+          PUBLIC_REPO="graupel/ios-quadrascan-sdk"
+          
+          {
+            echo "RELEASE_BRANCH=$RELEASE_BRANCH"
+            echo "INTERNAL_REPO=$INTERNAL_REPO"
+            echo "PUBLIC_REPO=$PUBLIC_REPO"
+          } >> "$GITHUB_ENV"
+          
+          echo "Release branch: $RELEASE_BRANCH"
+          echo "Internal repo: $INTERNAL_REPO"
+          echo "Public repo: $PUBLIC_REPO"
+
+      - name: Check if Release Already Exists
+        id: check_release
+        run: |
+          if gh release view "$TAG" --repo "$PUBLIC_REPO" &>/dev/null; then
+            echo "Release $TAG already exists on public repo. Exiting."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Checkout Repository
+        if: steps.check_release.outputs.exists == 'false'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download XCFramework from Internal Release
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          echo "Downloading $FRAMEWORK_NAME.zip from internal release..."
+          
+          gh release download "$TAG" \
+            --repo "$INTERNAL_REPO" \
+            --pattern "$FRAMEWORK_NAME.zip"
+          
+          if [ ! -f "$FRAMEWORK_NAME.zip" ]; then
+            echo "Error: Failed to download $FRAMEWORK_NAME.zip"
+            exit 1
+          fi
+          
+          echo "✓ Downloaded $FRAMEWORK_NAME.zip"
+          ls -lh "$FRAMEWORK_NAME.zip"
+        env:
+          GH_TOKEN: ${{ secrets.INTERNAL_REPO_TOKEN }}
+
+      - name: Download Metadata from Internal Release
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          echo "Downloading release_metadata.json from internal release..."
+          
+          gh release download "$TAG" \
+            --repo "$INTERNAL_REPO" \
+            --pattern "release_metadata.json"
+          
+          echo "✓ Downloaded release_metadata.json"
+        env:
+          GH_TOKEN: ${{ secrets.INTERNAL_REPO_TOKEN }}
+
+      - name: Checkout or Create Release Branch
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          echo "Working with release branch: $RELEASE_BRANCH"
+          
+          # Fetch all remote branches
+          git fetch origin
+          
+          if git ls-remote --heads origin "$RELEASE_BRANCH" | grep -q "$RELEASE_BRANCH"; then
+            echo "Release branch $RELEASE_BRANCH exists - checking it out to build on existing commits"
+            git checkout -b "$RELEASE_BRANCH" "origin/$RELEASE_BRANCH"
+            git log --oneline -3
+          else
+            echo "Creating new release branch: $RELEASE_BRANCH from current HEAD"
+            git checkout -b "$RELEASE_BRANCH"
+            git push -u origin "$RELEASE_BRANCH"
+          fi
+          
+          echo "✓ Ready to commit on: $RELEASE_BRANCH"
+
+      - name: Update Package.swift
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          echo "Updating Package.swift with version $VERSION and checksum..."
+          
+          DOWNLOAD_URL="https://github.com/$PUBLIC_REPO/releases/download/$TAG/$FRAMEWORK_NAME.zip"
+          
+          cat > Package.swift <<'EOF'
+          // swift-tools-version: 6.0
+          import PackageDescription
+          
+          let package = Package(
+              name: "Quadrascan",
+              platforms: [.iOS(.v17)],
+              products: [
+                  .library(
+                      name: "Quadrascan",
+                      targets: ["Quadrascan"]
+                  )
+              ],
+              targets: [
+                  .binaryTarget(
+                      name: "Quadrascan",
+                      url: "URL_PLACEHOLDER",
+                      checksum: "CHECKSUM_PLACEHOLDER"
+                  )
+              ]
+          )
+          EOF
+          
+          sed -i "s|URL_PLACEHOLDER|$DOWNLOAD_URL|g" Package.swift
+          sed -i "s|CHECKSUM_PLACEHOLDER|$CHECKSUM|g" Package.swift
+          
+          echo "✓ Package.swift updated"
+          cat Package.swift
+
+      - name: Commit and Push Package.swift
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          git config user.name "fm-automatiton-user"
+          git config user.email "automation@fitmatch.ai"
+          
+          git add Package.swift
+          git commit -m "Update Package.swift for $TAG"
+          git push origin "$RELEASE_BRANCH"
+          
+          echo "✓ Package.swift committed and pushed"
+          echo "Commit hash: $(git rev-parse HEAD)"
+
+      - name: Create Public GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          echo "Creating release $TAG on public repo..."
+          
+          gh release create "$TAG" \
+            --repo "$PUBLIC_REPO" \
+            --title "$TAG" \
+            --notes "" \
+            --target "$RELEASE_BRANCH" \
+            "$FRAMEWORK_NAME.zip" \
+            release_metadata.json
+          
+          echo "✓ Public release created successfully"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Summary
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          {
+            echo "## Deployment Summary"
+            echo ""
+            echo "- **Version:** $VERSION"
+            echo "- **Tag:** $TAG"
+            echo "- **Framework:** $FRAMEWORK_NAME"
+            echo "- **Checksum:** $CHECKSUM"
+            echo "- **Release Branch:** $RELEASE_BRANCH"
+            echo "- **Commit:** $(git rev-parse HEAD)"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
