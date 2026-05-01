@@ -15,8 +15,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "Quadrascan",
-            url: "https://github.com/graupel/ios-quadrascan-sdk/releases/download/v0.8.0/Quadrascan-0.8.0.xcframework.zip",
-            checksum: "241028576b77b29ed0b91d9611ce1337272cb60ff25452cadcff3e48c15a9747"
+            url: "https://github.com/graupel/ios-quadrascan-sdk/releases/download/v0.8.1/Quadrascan-0.8.1.xcframework.zip",
+            checksum: "581e7e81014f60c6a0b2e1c90aea2068119da9e792d7d50e12466c37ed1345c3"
         )
     ]
 )
