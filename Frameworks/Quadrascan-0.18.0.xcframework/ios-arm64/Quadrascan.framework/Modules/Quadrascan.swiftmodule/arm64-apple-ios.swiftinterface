@@ -1,0 +1,350 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+// swift-module-flags: -target arm64-apple-ios17.0 -enable-objc-interop -enable-library-evolution -language-mode 6 -O -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -module-name Quadrascan
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.4
+@preconcurrency import AVFoundation
+import CoreImage.CIFilterBuiltins
+import CoreGraphics
+import CoreImage
+import CoreMotion
+import CoreTransferable
+import CreateMLComponents
+import CryptoKit
+import DeveloperToolsSupport
+import Foundation
+import ImageIO
+import ModelIO
+import SceneKit.ModelIO
+import OSLog
+import PhotosUI
+import SceneKit
+import Security
+import Swift
+import SwiftUI
+import UIKit.UIDevice
+import UIKit.UIImage
+import UIKit
+import UniformTypeIdentifiers
+import Vision
+import _Concurrency
+import _CoreMotion_SwiftUI
+import _PhotosUI_SwiftUI
+import _SceneKit_SwiftUI
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os
+import zlib
+extension Foundation::FileManager : @unchecked @retroactive Swift::Sendable {
+}
+public struct Measurements : Swift::Equatable, Swift::Codable, Swift::Sendable {
+  public let breadths: Quadrascan::Measurements.Quadrascan::Breadths?
+  public let fullBody: Quadrascan::Measurements.Quadrascan::FullBody?
+  public let lowerCircumferences: Quadrascan::Measurements.Quadrascan::LowerCircumferences?
+  public let upperCircumferences: Quadrascan::Measurements.Quadrascan::UpperCircumferences?
+  public let userInputs: Quadrascan::Measurements.Quadrascan::UserInputs?
+  public let rawMeasurements: [Swift::String : Quadrascan::Measurements.Quadrascan::Category]
+  public var sizeRecommendations: Quadrascan::Measurements.Quadrascan::Category? {
+    get
+  }
+  public init(breadths: Quadrascan::Measurements.Quadrascan::Breadths? = nil, fullBody: Quadrascan::Measurements.Quadrascan::FullBody? = nil, lowerCircumferences: Quadrascan::Measurements.Quadrascan::LowerCircumferences? = nil, upperCircumferences: Quadrascan::Measurements.Quadrascan::UpperCircumferences? = nil, userInputs: Quadrascan::Measurements.Quadrascan::UserInputs? = nil, rawMeasurements: [Swift::String : Quadrascan::Measurements.Quadrascan::Category] = [:])
+  public static func == (a: Quadrascan::Measurements, b: Quadrascan::Measurements) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+extension Quadrascan::Measurements {
+  public struct Category : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let measurements: [Swift::String : Quadrascan::Measurements.Quadrascan::Item]
+    public subscript(key: Swift::String) -> Quadrascan::Measurements.Quadrascan::Item? {
+      get
+    }
+    public static func == (a: Quadrascan::Measurements.Quadrascan::Category, b: Quadrascan::Measurements.Quadrascan::Category) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+  public struct Item : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let value: Swift::Double?
+    public let stringValue: Swift::String?
+    public let unit: Swift::String?
+    public var hasValue: Swift::Bool {
+      get
+    }
+    public static func == (a: Quadrascan::Measurements.Quadrascan::Item, b: Quadrascan::Measurements.Quadrascan::Item) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct Quantity : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let value: Swift::Double?
+    public init(displayName: Swift::String?, value: Swift::Double?, unit: Foundation::Dimension? = nil)
+    public var unit: Foundation::Dimension? {
+      get
+    }
+    public static func == (a: Quadrascan::Measurements.Quadrascan::Quantity, b: Quadrascan::Measurements.Quadrascan::Quantity) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct Breadths : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let anteriorPosteriorChest: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let transverseChest: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let waist: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let hip: Quadrascan::Measurements.Quadrascan::Quantity?
+    public init(displayName: Swift::String? = nil, anteriorPosteriorChest: Quadrascan::Measurements.Quadrascan::Quantity? = nil, transverseChest: Quadrascan::Measurements.Quadrascan::Quantity? = nil, waist: Quadrascan::Measurements.Quadrascan::Quantity? = nil, hip: Quadrascan::Measurements.Quadrascan::Quantity? = nil)
+    public static func == (a: Quadrascan::Measurements.Quadrascan::Breadths, b: Quadrascan::Measurements.Quadrascan::Breadths) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct FullBody : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let bodyHeight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let seatedHeight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let legLength: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let legLengthLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let legLengthRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let weight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let bmi: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let bri: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let waistToHeightRatio: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let waistToHipRatio: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let seatedToStandingRatio: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let phv: Quadrascan::Measurements.Quadrascan::Quantity?
+    public init(displayName: Swift::String? = nil, bodyHeight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, seatedHeight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, legLength: Quadrascan::Measurements.Quadrascan::Quantity? = nil, legLengthLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, legLengthRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, weight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, bmi: Quadrascan::Measurements.Quadrascan::Quantity? = nil, bri: Quadrascan::Measurements.Quadrascan::Quantity? = nil, waistToHeightRatio: Quadrascan::Measurements.Quadrascan::Quantity? = nil, waistToHipRatio: Quadrascan::Measurements.Quadrascan::Quantity? = nil, seatedToStandingRatio: Quadrascan::Measurements.Quadrascan::Quantity? = nil, phv: Quadrascan::Measurements.Quadrascan::Quantity? = nil)
+    public static func == (a: Quadrascan::Measurements.Quadrascan::FullBody, b: Quadrascan::Measurements.Quadrascan::FullBody) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct LowerCircumferences : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let hip: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperThigh: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperThighLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperThighRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let midThigh: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let midThighLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let midThighRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let calf: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let calfLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let calfRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public init(displayName: Swift::String? = nil, hip: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperThigh: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperThighLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperThighRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, midThigh: Quadrascan::Measurements.Quadrascan::Quantity? = nil, midThighLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, midThighRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, calf: Quadrascan::Measurements.Quadrascan::Quantity? = nil, calfLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, calfRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil)
+    public static func == (a: Quadrascan::Measurements.Quadrascan::LowerCircumferences, b: Quadrascan::Measurements.Quadrascan::LowerCircumferences) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct UpperCircumferences : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let chest: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let waistNarrowest: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let waist: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperArm: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperArmLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let upperArmRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let forearm: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let forearmLeft: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let forearmRight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public init(displayName: Swift::String? = nil, chest: Quadrascan::Measurements.Quadrascan::Quantity? = nil, waistNarrowest: Quadrascan::Measurements.Quadrascan::Quantity? = nil, waist: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperArm: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperArmLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, upperArmRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil, forearm: Quadrascan::Measurements.Quadrascan::Quantity? = nil, forearmLeft: Quadrascan::Measurements.Quadrascan::Quantity? = nil, forearmRight: Quadrascan::Measurements.Quadrascan::Quantity? = nil)
+    public static func == (a: Quadrascan::Measurements.Quadrascan::UpperCircumferences, b: Quadrascan::Measurements.Quadrascan::UpperCircumferences) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+extension Quadrascan::Measurements {
+  public struct UserInputs : Swift::Equatable, Swift::Codable, Swift::Sendable {
+    public let displayName: Swift::String?
+    public let heightFeetComponent: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let heightInchesComponent: Quadrascan::Measurements.Quadrascan::Quantity?
+    public let weight: Quadrascan::Measurements.Quadrascan::Quantity?
+    public init(displayName: Swift::String? = nil, heightFeetComponent: Quadrascan::Measurements.Quadrascan::Quantity? = nil, heightInchesComponent: Quadrascan::Measurements.Quadrascan::Quantity? = nil, weight: Quadrascan::Measurements.Quadrascan::Quantity? = nil)
+    public static func == (a: Quadrascan::Measurements.Quadrascan::UserInputs, b: Quadrascan::Measurements.Quadrascan::UserInputs) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+}
+@_Concurrency::MainActor @preconcurrency public struct QuadrascanView : SwiftUICore::View {
+  @_Concurrency::MainActor @preconcurrency public init(configuration: Quadrascan::QuadrascanConfiguration, completion: @escaping (Quadrascan::QuadrascanResponse) -> Swift::Void)
+  @_Concurrency::MainActor @preconcurrency public var body: some SwiftUICore::View {
+    get
+  }
+  public typealias Body = @_opaqueReturnTypeOf("$s10Quadrascan0A4ViewV4bodyQrvp", 0) __
+}
+public enum QuadrascanFlow : Swift::Sendable {
+  case guidedCapture
+  case cameraCapture
+  case photoPicker
+}
+public struct QuadrascanConfiguration {
+  public init(teamID: Quadrascan::QuadrascanInput<Swift::String> = .editable(), operatorName: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), firstName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), lastName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), gender: Quadrascan::QuadrascanInput<Quadrascan::QuadrascanResult.Quadrascan::Gender> = .editable(), birthDate: Quadrascan::QuadrascanInput<Foundation::Date> = .editable(), heightInInches: Quadrascan::QuadrascanInput<Swift::Double> = .editable(), weightInPounds: Quadrascan::QuadrascanInput<Swift::Double> = .hidden(), email: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), customID: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), meshGenerationServiceToken: Swift::String? = nil, measurementServiceToken: Swift::String? = nil, flow: Quadrascan::QuadrascanFlow = .guidedCapture, requestedOutput: Quadrascan::QuadrascanOutput, clientUserID: Swift::String? = nil, appearance: Quadrascan::QuadrascanAppearance? = nil, shouldUseImperialUnits: Swift::Bool = false, didConsentToDataProcessing: Swift::Bool? = nil, didCertifyAge: Swift::Bool? = nil, didConfirmParentalConsent: Swift::Bool? = nil, resetsConsentOnIdentityEdit: Swift::Bool = false, telemetryEnabled: Swift::Bool = true, logLevelThreshold: os::OSLogType = .error) throws
+  public static func guidedCapture(teamID: Quadrascan::QuadrascanInput<Swift::String> = .editable(), operatorName: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), firstName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), lastName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), gender: Quadrascan::QuadrascanInput<Quadrascan::QuadrascanResult.Quadrascan::Gender> = .editable(), birthDate: Quadrascan::QuadrascanInput<Foundation::Date> = .editable(), heightInInches: Quadrascan::QuadrascanInput<Swift::Double> = .editable(), weightInPounds: Quadrascan::QuadrascanInput<Swift::Double> = .hidden(), email: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), customID: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), meshGenerationServiceToken: Swift::String, measurementServiceToken: Swift::String? = nil, requestedOutput: Quadrascan::QuadrascanOutput, clientUserID: Swift::String? = nil, appearance: Quadrascan::QuadrascanAppearance? = nil, shouldUseImperialUnits: Swift::Bool = false, didConsentToDataProcessing: Swift::Bool? = nil, didCertifyAge: Swift::Bool? = nil, didConfirmParentalConsent: Swift::Bool? = nil, telemetryEnabled: Swift::Bool = true, logLevelThreshold: os::OSLogType = .error) throws -> Quadrascan::QuadrascanConfiguration
+  public static func cameraCapture(teamID: Quadrascan::QuadrascanInput<Swift::String> = .editable(), operatorName: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), firstName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), lastName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), gender: Quadrascan::QuadrascanInput<Quadrascan::QuadrascanResult.Quadrascan::Gender> = .editable(), birthDate: Quadrascan::QuadrascanInput<Foundation::Date> = .editable(), heightInInches: Quadrascan::QuadrascanInput<Swift::Double> = .editable(), weightInPounds: Quadrascan::QuadrascanInput<Swift::Double> = .hidden(), email: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), customID: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), meshGenerationServiceToken: Swift::String, measurementServiceToken: Swift::String? = nil, requestedOutput: Quadrascan::QuadrascanOutput, clientUserID: Swift::String? = nil, appearance: Quadrascan::QuadrascanAppearance? = nil, shouldUseImperialUnits: Swift::Bool = false, didConsentToDataProcessing: Swift::Bool? = nil, didCertifyAge: Swift::Bool? = nil, didConfirmParentalConsent: Swift::Bool? = nil, telemetryEnabled: Swift::Bool = true, logLevelThreshold: os::OSLogType = .error) throws -> Quadrascan::QuadrascanConfiguration
+  public static func photoPicker(teamID: Quadrascan::QuadrascanInput<Swift::String> = .editable(), operatorName: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), firstName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), lastName: Quadrascan::QuadrascanInput<Swift::String> = .editable(), gender: Quadrascan::QuadrascanInput<Quadrascan::QuadrascanResult.Quadrascan::Gender> = .editable(), birthDate: Quadrascan::QuadrascanInput<Foundation::Date> = .editable(), heightInInches: Quadrascan::QuadrascanInput<Swift::Double> = .editable(), weightInPounds: Quadrascan::QuadrascanInput<Swift::Double> = .hidden(), email: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), customID: Quadrascan::QuadrascanInput<Swift::String> = .hidden(), meshGenerationServiceToken: Swift::String, measurementServiceToken: Swift::String? = nil, requestedOutput: Quadrascan::QuadrascanOutput, clientUserID: Swift::String? = nil, appearance: Quadrascan::QuadrascanAppearance? = nil, shouldUseImperialUnits: Swift::Bool = false, didConsentToDataProcessing: Swift::Bool? = nil, didCertifyAge: Swift::Bool? = nil, didConfirmParentalConsent: Swift::Bool? = nil, telemetryEnabled: Swift::Bool = true, logLevelThreshold: os::OSLogType = .error) throws -> Quadrascan::QuadrascanConfiguration
+}
+public struct QuadrascanAppearance {
+  public var accentColor: SwiftUICore::Color?
+  public init(accentColor: SwiftUICore::Color? = nil)
+}
+public struct QuadrascanOutput : Swift::OptionSet, Swift::Sendable {
+  public let rawValue: Swift::Int
+  public static let measurements: Quadrascan::QuadrascanOutput
+  public static let objMesh: Quadrascan::QuadrascanOutput
+  public static let usdzModel: Quadrascan::QuadrascanOutput
+  public static let stlMesh: Quadrascan::QuadrascanOutput
+  public init(rawValue: Swift::Int)
+  public typealias ArrayLiteralElement = Quadrascan::QuadrascanOutput
+  public typealias Element = Quadrascan::QuadrascanOutput
+  public typealias RawValue = Swift::Int
+}
+public enum DismissalReason : Swift::Sendable {
+  case userExited
+  case consentEditRequested
+  public static func == (a: Quadrascan::DismissalReason, b: Quadrascan::DismissalReason) -> Swift::Bool
+  public func hash(into hasher: inout Swift::Hasher)
+  public var hashValue: Swift::Int {
+    get
+  }
+}
+public enum QuadrascanResponse : Swift::Sendable {
+  case success(Quadrascan::QuadrascanResult)
+  case cancelled(reason: Quadrascan::DismissalReason)
+  case failure(Quadrascan::QuadrascanError)
+}
+public struct QuadrascanResult : Swift::Sendable, Swift::Equatable {
+  public let scanInfo: Quadrascan::QuadrascanResult.Quadrascan::ScanInfo?
+  public let model: Quadrascan::QuadrascanResult.Quadrascan::ModelOutput?
+  public let measurement: Quadrascan::QuadrascanResult.Quadrascan::MeasurementOutput?
+  public let metadata: [Swift::String : Swift::String]
+  public init(scanInfo: Quadrascan::QuadrascanResult.Quadrascan::ScanInfo? = nil, model: Quadrascan::QuadrascanResult.Quadrascan::ModelOutput? = nil, measurement: Quadrascan::QuadrascanResult.Quadrascan::MeasurementOutput? = nil, metadata: [Swift::String : Swift::String] = [:])
+  public enum ModelOutput : Swift::Sendable, Swift::Equatable {
+    case usdz(Foundation::Data)
+    case obj(Foundation::Data)
+    case stl(Foundation::Data)
+    public static func == (a: Quadrascan::QuadrascanResult.Quadrascan::ModelOutput, b: Quadrascan::QuadrascanResult.Quadrascan::ModelOutput) -> Swift::Bool
+  }
+  public struct MeasurementOutput : Swift::Sendable, Swift::Codable, Swift::Equatable {
+    public let scanID: Swift::String
+    public let measurements: Quadrascan::Measurements
+    public init(scanID: Swift::String, measurements: Quadrascan::Measurements)
+    public static func == (a: Quadrascan::QuadrascanResult.Quadrascan::MeasurementOutput, b: Quadrascan::QuadrascanResult.Quadrascan::MeasurementOutput) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+  public enum Gender : Swift::String, Swift::CaseIterable, Swift::Sendable, Swift::Codable {
+    case male
+    case female
+    public init?(rawValue: Swift::String)
+    public typealias AllCases = [Quadrascan::QuadrascanResult.Quadrascan::Gender]
+    public typealias RawValue = Swift::String
+    nonisolated public static var allCases: [Quadrascan::QuadrascanResult.Quadrascan::Gender] {
+      get
+    }
+    public var rawValue: Swift::String {
+      get
+    }
+  }
+  public struct ScanInfo : Swift::Sendable, Swift::Codable, Swift::Equatable {
+    public let teamID: Swift::String?
+    public let firstName: Swift::String?
+    public let lastName: Swift::String?
+    public let heightInInches: Swift::Double?
+    public let weightInPounds: Swift::Double?
+    public let gender: Quadrascan::QuadrascanResult.Quadrascan::Gender?
+    public let birthDate: Foundation::Date?
+    public let email: Swift::String?
+    public let operatorName: Swift::String?
+    public let customID: Swift::String?
+    public let didConsentToDataProcessing: Swift::Bool?
+    public let didCertifyAge: Swift::Bool?
+    public let didConfirmParentalConsent: Swift::Bool?
+    public let sessionContext: Quadrascan::ScanSessionContext?
+    public init(teamID: Swift::String? = nil, firstName: Swift::String? = nil, lastName: Swift::String? = nil, heightInInches: Swift::Double? = nil, weightInPounds: Swift::Double? = nil, gender: Quadrascan::QuadrascanResult.Quadrascan::Gender? = nil, birthDate: Foundation::Date? = nil, email: Swift::String? = nil, operatorName: Swift::String? = nil, customID: Swift::String? = nil, didConsentToDataProcessing: Swift::Bool? = nil, didCertifyAge: Swift::Bool? = nil, didConfirmParentalConsent: Swift::Bool? = nil, sessionContext: Quadrascan::ScanSessionContext? = nil)
+    public static func == (a: Quadrascan::QuadrascanResult.Quadrascan::ScanInfo, b: Quadrascan::QuadrascanResult.Quadrascan::ScanInfo) -> Swift::Bool
+    public func encode(to encoder: any Swift::Encoder) throws
+    public init(from decoder: any Swift::Decoder) throws
+  }
+  public static func == (a: Quadrascan::QuadrascanResult, b: Quadrascan::QuadrascanResult) -> Swift::Bool
+}
+public enum QuadrascanError : Swift::Error, @unchecked Swift::Sendable, Foundation::LocalizedError {
+  case captureError(underlying: any Swift::Error)
+  case meshGenerationError(underlying: any Swift::Error)
+  case meshProcessingError(underlying: any Swift::Error)
+  case measurementGenerationError(underlying: any Swift::Error)
+  case configurationError(underlying: any Swift::Error)
+  public var errorDescription: Swift::String? {
+    get
+  }
+  public var httpStatusCode: Swift::Int? {
+    get
+  }
+}
+public enum MeasurementProgress : Swift::Sendable {
+  case registeringSubject
+  case uploading(fraction: Swift::Double)
+  case fetchingResults
+}
+public enum MeasurementGenerationEvent : Swift::Sendable {
+  case progress(Quadrascan::MeasurementProgress)
+  case completed(Quadrascan::QuadrascanResult)
+}
+public func generateMeasurements(usdzURL: Foundation::URL, scanInfo: Quadrascan::QuadrascanResult.Quadrascan::ScanInfo, measurementServiceToken: Swift::String) -> _Concurrency::AsyncThrowingStream<Quadrascan::MeasurementGenerationEvent, any Swift::Error>
+public enum QuadrascanInput<Value> : Swift::Sendable where Value : Swift::Sendable {
+  case editable(_: Value? = nil)
+  case locked(Value)
+  case hidden(_: Value? = nil)
+}
+extension Quadrascan::QuadrascanInput : Swift::Equatable where Value : Swift::Equatable {
+  public static func == (a: Quadrascan::QuadrascanInput<Value>, b: Quadrascan::QuadrascanInput<Value>) -> Swift::Bool
+}
+public struct ScanSessionContext : Swift::Sendable, Swift::Codable, Swift::Equatable {
+  public static func == (a: Quadrascan::ScanSessionContext, b: Quadrascan::ScanSessionContext) -> Swift::Bool
+  public func encode(to encoder: any Swift::Encoder) throws
+  public init(from decoder: any Swift::Decoder) throws
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extension Quadrascan::QuadrascanView : Swift::Sendable {}
+extension Quadrascan::DismissalReason : Swift::Equatable {}
+extension Quadrascan::DismissalReason : Swift::Hashable {}
+extension Quadrascan::QuadrascanResult.Quadrascan::Gender : Swift::Equatable {}
+extension Quadrascan::QuadrascanResult.Quadrascan::Gender : Swift::Hashable {}
+extension Quadrascan::QuadrascanResult.Quadrascan::Gender : Swift::RawRepresentable {}
