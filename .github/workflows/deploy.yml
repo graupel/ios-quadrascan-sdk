@@ -61,25 +61,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download XCFramework from Internal Release
-        if: steps.check_release.outputs.exists == 'false'
-        run: |
-          echo "Downloading $FRAMEWORK_NAME.zip from internal release..."
-          
-          gh release download "$TAG" \
-            --repo "$INTERNAL_REPO" \
-            --pattern "$FRAMEWORK_NAME.zip"
-          
-          if [ ! -f "$FRAMEWORK_NAME.zip" ]; then
-            echo "Error: Failed to download $FRAMEWORK_NAME.zip"
-            exit 1
-          fi
-          
-          echo "✓ Downloaded $FRAMEWORK_NAME.zip"
-          ls -lh "$FRAMEWORK_NAME.zip"
-        env:
-          GH_TOKEN: ${{ secrets.INTERNAL_REPO_TOKEN }}
-
       - name: Download Metadata from Internal Release
         if: steps.check_release.outputs.exists == 'false'
         run: |
@@ -90,6 +71,36 @@ jobs:
             --pattern "release_metadata.json"
           
           echo "✓ Downloaded release_metadata.json"
+        env:
+          GH_TOKEN: ${{ secrets.INTERNAL_REPO_TOKEN }}
+
+      - name: Download XCFrameworks from Internal Release
+        if: steps.check_release.outputs.exists == 'false'
+        run: |
+          # From 0.20 the metadata lists the core and UI frameworks. Earlier releases
+          # carry one framework, named in the dispatch payload.
+          if jq -e '.frameworks[0].module' release_metadata.json > /dev/null; then
+            ARCHIVES=$(jq -r '[.frameworks[].name] | join(" ")' release_metadata.json)
+          else
+            ARCHIVES="$FRAMEWORK_NAME"
+          fi
+          echo "FRAMEWORK_NAMES=$ARCHIVES" >> "$GITHUB_ENV"
+          
+          for NAME in $ARCHIVES; do
+            echo "Downloading $NAME.zip from internal release..."
+          
+            gh release download "$TAG" \
+              --repo "$INTERNAL_REPO" \
+              --pattern "$NAME.zip"
+
+            if [ ! -f "$NAME.zip" ]; then
+              echo "Error: Failed to download $NAME.zip"
+              exit 1
+            fi
+
+            echo "✓ Downloaded $NAME.zip"
+            ls -lh "$NAME.zip"
+          done
         env:
           GH_TOKEN: ${{ secrets.INTERNAL_REPO_TOKEN }}
 
@@ -116,11 +127,62 @@ jobs:
       - name: Update Package.swift
         if: steps.check_release.outputs.exists == 'false'
         run: |
-          echo "Updating Package.swift with version $VERSION and checksum..."
+          echo "Updating Package.swift for $TAG..."
+
+          RELEASE_URL="https://github.com/$PUBLIC_REPO/releases/download/$TAG"
+
+          if jq -e '.frameworks[0].module' release_metadata.json > /dev/null; then
+            CORE_NAME=$(jq -r '.frameworks[] | select(.module == "Quadrascan") | .name' release_metadata.json)
+            CORE_CHECKSUM=$(jq -r '.frameworks[] | select(.module == "Quadrascan") | .compressed_framework_hash' release_metadata.json)
+            UI_NAME=$(jq -r '.frameworks[] | select(.module == "QuadrascanUI") | .name' release_metadata.json)
+            UI_CHECKSUM=$(jq -r '.frameworks[] | select(.module == "QuadrascanUI") | .compressed_framework_hash' release_metadata.json)
           
-          DOWNLOAD_URL="https://github.com/$PUBLIC_REPO/releases/download/$TAG/$FRAMEWORK_NAME.zip"
+            if [ -z "$CORE_NAME" ] || [ -z "$CORE_CHECKSUM" ] || [ -z "$UI_NAME" ] || [ -z "$UI_CHECKSUM" ]; then
+              echo "Error: release_metadata.json must list the Quadrascan and QuadrascanUI frameworks with checksums"
+              exit 1
+            fi
           
-          cat > Package.swift <<'EOF'
+            # A binary target cannot declare dependencies, so the UI product lists both targets.
+            cat > Package.swift <<'EOF'
+          // swift-tools-version: 6.2
+          // The swift-tools-version declares the minimum version of Swift required to build this package.
+
+          import PackageDescription
+
+          let package = Package(
+              name: "Quadrascan",
+              platforms: [.iOS(.v17)],
+              products: [
+                  .library(
+                      name: "Quadrascan",
+                      targets: ["Quadrascan"]
+                  ),
+                  .library(
+                      name: "QuadrascanUI",
+                      targets: ["QuadrascanUI", "Quadrascan"]
+                  )
+              ],
+              targets: [
+                  .binaryTarget(
+                      name: "Quadrascan",
+                      url: "CORE_URL_PLACEHOLDER",
+                      checksum: "CORE_CHECKSUM_PLACEHOLDER"
+                  ),
+                  .binaryTarget(
+                      name: "QuadrascanUI",
+                      url: "UI_URL_PLACEHOLDER",
+                      checksum: "UI_CHECKSUM_PLACEHOLDER"
+                  )
+              ]
+          )
+          EOF
+
+            sed -i "s|CORE_URL_PLACEHOLDER|$RELEASE_URL/$CORE_NAME.zip|g" Package.swift
+            sed -i "s|CORE_CHECKSUM_PLACEHOLDER|$CORE_CHECKSUM|g" Package.swift
+            sed -i "s|UI_URL_PLACEHOLDER|$RELEASE_URL/$UI_NAME.zip|g" Package.swift
+            sed -i "s|UI_CHECKSUM_PLACEHOLDER|$UI_CHECKSUM|g" Package.swift
+          else
+            cat > Package.swift <<'EOF'
           // swift-tools-version: 6.2
           // The swift-tools-version declares the minimum version of Swift required to build this package.
           
@@ -145,8 +207,9 @@ jobs:
           )
           EOF
           
-          sed -i "s|URL_PLACEHOLDER|$DOWNLOAD_URL|g" Package.swift
-          sed -i "s|CHECKSUM_PLACEHOLDER|$CHECKSUM|g" Package.swift
+            sed -i "s|URL_PLACEHOLDER|$RELEASE_URL/$FRAMEWORK_NAME.zip|g" Package.swift
+            sed -i "s|CHECKSUM_PLACEHOLDER|$CHECKSUM|g" Package.swift
+          fi
           
           echo "✓ Package.swift updated"
           cat Package.swift
@@ -169,12 +232,17 @@ jobs:
         run: |
           echo "Creating release $TAG on public repo..."
           
+          FRAMEWORK_ZIPS=()
+          for NAME in $FRAMEWORK_NAMES; do
+            FRAMEWORK_ZIPS+=("$NAME.zip")
+          done
+
           gh release create "$TAG" \
             --repo "$PUBLIC_REPO" \
             --title "$TAG" \
             --notes "" \
             --target "$RELEASE_BRANCH" \
-            "$FRAMEWORK_NAME.zip" \
+            "${FRAMEWORK_ZIPS[@]}" \
             release_metadata.json
           
           echo "✓ Public release created successfully"
@@ -189,8 +257,7 @@ jobs:
             echo ""
             echo "- **Version:** $VERSION"
             echo "- **Tag:** $TAG"
-            echo "- **Framework:** $FRAMEWORK_NAME"
-            echo "- **Checksum:** $CHECKSUM"
+            echo "- **Frameworks:** $FRAMEWORK_NAMES"
             echo "- **Release Branch:** $RELEASE_BRANCH"
             echo "- **Commit:** $(git rev-parse HEAD)"
             echo ""
